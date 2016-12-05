@@ -24,19 +24,21 @@
 								計時:{{countDownTime}}
 							</span>
 
+							<div class="pull-right">
 							<span class="tag tag-pill tag-info">
 								得分:{{scores}}
 							</span>
 							<span class="tag tag-pill tag-info">
-								打字速度:{{typingRate}}字/每分鐘
+								速度:{{typingRate}}字/每分鐘
 							</span>
+							</div>
 						</div>
 					</h3>
 				</div>
 
 
-				<div class="col-xs-10 col-md-10 bg-grayLighter padding10 block-shadow" style="left: 10%;">
-					<div class="bg-white" style="width: 100%; height: 50px">
+				<div class="col-xs-10 col-md-10 bg-grayLighter padding10 block-shadow" style="left: 10%; border:solid 2px white; border-radius: 5px;" >
+					<div class="bg-white" style="width: 100%; height: 45px">
 						<div style="height: 100%">
 							<div class="panel">
 								<div class="heading bg-lightOrange fg-darkCobalt" style="font-family:DFKai-sb,標楷體;">
@@ -47,8 +49,12 @@
 					</div>
 
 					<span style="font-family:DFKai-sb,標楷體;">
-						<span v-if="display.length>0" v-html="display" class="text-light">article</span>
+
+						<span v-html="focusArticle" class="text-light">focusArticle</span>
+						<!-- 
+						<span v-if="focusArticle.length>0" v-html="focusArticle" class="text-light">focusArticle</span>
 						<span v-else>{{article}}</span>
+						 -->
 					</span>
 
 					<br/>
@@ -58,24 +64,6 @@
 					</textarea>
 
 				</div>		
-
-					<!-- 	
-				<div class="col-xs-2 col-md-2">
-					<div class="bg-graylighter">
-
-						<div class="bg-grayLighter">
-							計時:{{countDownTime}}
-							<br/>
-							<br/>
-							得分:{{scores}}
-							<br/>
-							<br/>
-							打字速度:{{typingRate}}字/每分鐘
-						</div>
-
-					</div>
-				</div>		
-			-->
 
 			</div>		
 	</div>
@@ -90,6 +78,8 @@
 				data: {
 					input:'',
 					article:'周五夜不當循行平常的生活路線，心思視野總歡喜在綠園道上行走。月出，星還在路上，寬闊草原人潮仍未聚集，遊人散坐一旁階梯，滑手機或聊天，街頭藝人各占據點架設麥克風，電吉他錚錚撥出零散試音，音箱被抬至合適位置，仰天、相對或分開些！夜氛未濃，七點過後台上旋音仍然鬆散，兩位主唱嗓音未開，左調麥克風右轉接頭，提袋裡的小瑪爾濟斯屢要逃出，名喚D的年輕歌者一次次起身將牠拉回。旋律慵懶，忙碌與休閒未能順接，路人三兩經過，各方狗兒陸續登場。拉不拉多犬晃動一身棕土色厚毛，咧嘴吐舌微笑著，小博美輕靈快步，約克夏自另一頭蹦來，輕繩抑不住躁動，被關禁了整星期就等這刻。',
+					focusArticle:'',
+					previousChars:'',
 					display:'',
 					scores: 0,
 					position: 0,
@@ -100,6 +90,7 @@
 				},
 				created: function() {
 					// let self = this;
+					this.focusArticle = this.article.slice(0,50) + '...';
 					let i = this.countDownTime ;
 					let j = this.duration;
 					let isEditable = this.isEditable;
@@ -121,7 +112,7 @@
 				},
 				computed:{
 					typingRate: function(){
-						if (this.position!=0 && this.position%5 == 0) {
+						if (this.input.length!=0 && this.input.length %5 == 0) {
 							this.typingSpeed = (this.position/this.duration);
 
 						} 
@@ -134,9 +125,10 @@
 					isValid: function() {
 							// console.log(this.input.length);
 							this.position = this.input.length;
-							console.log(this.position);
+							// console.log(this.position);
 							this.scores = 0;
 							this.display = '';
+
 							let output = this.input.replace(/(,|\.)/g,function(v){
 								if (v===',') {return '，'};
 								if (v==='.') {return '。'};
@@ -145,10 +137,29 @@
 							this.input = output;
 							// console.log(this.input.length+':'+this.input);
 
+							// if (this.input.length>10) {
+							// 	this.focusArticle = this.article.slice(this.input.length-5, this.input.length+40);
+							// }
+
+							// console.log(this.focusArticle);
+
 							for (let i = 0; i < this.input.length; i++) {
 								let articleChar = this.article.slice(i,i+1);
-								// console.log(this.article.slice(i,i+1));
 								let inputChar = this.input.slice(i,i+1);
+								let previousArticleChar = '';
+								let previousInputChar = '';
+								if (i>0) {
+									previousArticleChar = this.article.slice(i-1,i);
+									previousInputChar = this.input.slice(i-1,i);
+								}
+
+								if (previousArticleChar === previousInputChar) {
+									previousArticleChar = '<span style="color:blue">' + previousArticleChar + '</span>';
+								} else {
+									previousArticleChar = '<span style="color:red">' + previousArticleChar + '</span>';
+
+								}
+
 								if (articleChar === inputChar) {
 									articleChar = '<span style="color:blue">' + articleChar + '</span>';
 									this.scores += 1;
@@ -156,12 +167,20 @@
 									articleChar = '<span style="color:red">' + articleChar + '</span>';
 
 								}
+
+								// if (i>10) {
+									this.focusArticle = previousArticleChar;
+									this.focusArticle = this.focusArticle + articleChar;	
+								// }
+
 								// console.log(this.display)
 								this.display = this.display + articleChar;
 								// console.log(this.article.slice(this.input.length,this.article.length));
 
 							}
-							this.display = this.display+ this.article.slice(this.input.length,this.article.length);
+
+							this.focusArticle = this.focusArticle + this.article.slice(this.input.length,this.input.length+40);
+							this.display = this.display + this.article.slice(this.input.length,this.article.length);
 						}
 					}
 				});
