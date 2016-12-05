@@ -122,6 +122,21 @@
 
 				},
 				methods: {
+					isMatch: function(articleChar,inputChar, shouldScore = false){
+
+						if (articleChar === inputChar) {
+									articleChar = '<span style="color:blue">' + articleChar + '</span>';
+									if(shouldScore){
+										this.scores += 1;
+									}
+								} else {
+									articleChar = '<span style="color:red">' + articleChar + '</span>';
+
+								}
+						return articleChar;
+
+
+					},
 					isValid: function() {
 							// console.log(this.input.length);
 							this.position = this.input.length;
@@ -151,22 +166,29 @@
 								if (i>0) {
 									previousArticleChar = this.article.slice(i-1,i);
 									previousInputChar = this.input.slice(i-1,i);
+									// this.say();
 								}
 
-								if (previousArticleChar === previousInputChar) {
-									previousArticleChar = '<span style="color:blue">' + previousArticleChar + '</span>';
-								} else {
-									previousArticleChar = '<span style="color:red">' + previousArticleChar + '</span>';
+previousArticleChar = this.isMatch(previousArticleChar,previousInputChar);
 
-								}
+								// if (previousArticleChar === previousInputChar) {
+								// 	previousArticleChar = '<span style="color:blue">' + previousArticleChar + '</span>';
+								// } else {
+								// 	previousArticleChar = '<span style="color:red">' + previousArticleChar + '</span>';
 
-								if (articleChar === inputChar) {
-									articleChar = '<span style="color:blue">' + articleChar + '</span>';
-									this.scores += 1;
-								} else {
-									articleChar = '<span style="color:red">' + articleChar + '</span>';
+								// }
 
-								}
+								articleChar = this.isMatch(articleChar,inputChar,true);
+
+
+
+								// if (articleChar === inputChar) {
+								// 	articleChar = '<span style="color:blue">' + articleChar + '</span>';
+								// 	this.scores += 1;
+								// } else {
+								// 	articleChar = '<span style="color:red">' + articleChar + '</span>';
+
+								// }
 
 								// if (i>10) {
 									this.focusArticle = previousArticleChar;
