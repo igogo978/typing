@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<title>Document</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+
+		<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+	    <link href="css/metro.css" rel="stylesheet">
+	    <link href="css/metro-icons.css" rel="stylesheet">
+	    <link href="css/metro-responsive.css" rel="stylesheet">
+		<script src="//unpkg.com/vue/dist/vue.js"></script>
+		<script src="//cdn.jsdelivr.net/vue.resource/1.0.3/vue-resource.min.js"></script>
+	</head>
+<body class="bg-darkTeal">
+	<div class="container" id='app'>
+			<div class="row">
+			
+			
+				<div class="col-xs-12 col-md-12" style="height: 50px;">
+					<h3><div>
+							<span class="tag tag-pill tag-info">
+								計時:{{countDownTime}}
+							</span>
+
+							<span class="tag tag-pill tag-info">
+								得分:{{scores}}
+							</span>
+							<span class="tag tag-pill tag-info">
+								打字速度:{{typingRate}}字/每分鐘
+							</span>
+						</div>
+					</h3>
+				</div>
+
+
+				<div class="col-xs-10 col-md-10 bg-grayLighter padding10 block-shadow" style="left: 10%;">
+					<div class="bg-white" style="width: 100%; height: 50px">
+						<div style="height: 100%">
+							<div class="panel">
+								<div class="heading bg-lightOrange fg-darkCobalt" style="font-family:DFKai-sb,標楷體;">
+									中文打字練習
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<span style="font-family:DFKai-sb,標楷體;">
+						<span v-if="display.length>0" v-html="display" class="text-light">article</span>
+						<span v-else>{{article}}</span>
+					</span>
+
+					<br/>
+					<br/>
+
+					<textarea v-bind:value="input" v-on:input="input = $event.target.value" @keyup="isValid" :disabled="!isEditable" style="width: 97%; height: 50px; resize: none;">
+					</textarea>
+
+				</div>		
+
+					<!-- 	
+				<div class="col-xs-2 col-md-2">
+					<div class="bg-graylighter">
+
+						<div class="bg-grayLighter">
+							計時:{{countDownTime}}
+							<br/>
+							<br/>
+							得分:{{scores}}
+							<br/>
+							<br/>
+							打字速度:{{typingRate}}字/每分鐘
+						</div>
+
+					</div>
+				</div>		
+			-->
+
+			</div>		
+	</div>
+
+
+	<footer>
+		<script>
+			"use strict";
+
+			var vm = new Vue({
+				el: "#app",
+				data: {
+					input:'',
+					article:'周五夜不當循行平常的生活路線，心思視野總歡喜在綠園道上行走。月出，星還在路上，寬闊草原人潮仍未聚集，遊人散坐一旁階梯，滑手機或聊天，街頭藝人各占據點架設麥克風，電吉他錚錚撥出零散試音，音箱被抬至合適位置，仰天、相對或分開些！夜氛未濃，七點過後台上旋音仍然鬆散，兩位主唱嗓音未開，左調麥克風右轉接頭，提袋裡的小瑪爾濟斯屢要逃出，名喚D的年輕歌者一次次起身將牠拉回。旋律慵懶，忙碌與休閒未能順接，路人三兩經過，各方狗兒陸續登場。拉不拉多犬晃動一身棕土色厚毛，咧嘴吐舌微笑著，小博美輕靈快步，約克夏自另一頭蹦來，輕繩抑不住躁動，被關禁了整星期就等這刻。',
+					display:'',
+					scores: 0,
+					position: 0,
+					countDownTime: 60,
+					duration: 0,
+					isEditable: true,
+					typingSpeed: 0
+				},
+				created: function() {
+					// let self = this;
+					let i = this.countDownTime ;
+					let j = this.duration;
+					let isEditable = this.isEditable;
+					const intervalId = setInterval(function(){
+						// console.log(i);
+						Vue.set(vm,'countDownTime',i);
+						Vue.set(vm,'duration',j);
+						i--;
+						j++;
+						if (i<0) {
+
+							Vue.set(vm,'isEditable',false);
+							clearInterval(intervalId);
+							
+						}
+						// console.log(this.$data.countDownTime);
+					},1000);
+
+				},
+				computed:{
+					typingRate: function(){
+						if (this.position!=0 && this.position%5 == 0) {
+							this.typingSpeed = (this.position/this.duration);
+
+						} 
+						return (this.typingSpeed*60).toFixed(2);
+
+					}
+
+				},
+				methods: {
+					isValid: function() {
+							// console.log(this.input.length);
+							this.position = this.input.length;
+							console.log(this.position);
+							this.scores = 0;
+							this.display = '';
+							let output = this.input.replace(/(,|\.)/g,function(v){
+								if (v===',') {return '，'};
+								if (v==='.') {return '。'};
+								if (v==='!') {return '！'};
+							});
+							this.input = output;
+							// console.log(this.input.length+':'+this.input);
+
+							for (let i = 0; i < this.input.length; i++) {
+								let articleChar = this.article.slice(i,i+1);
+								// console.log(this.article.slice(i,i+1));
+								let inputChar = this.input.slice(i,i+1);
+								if (articleChar === inputChar) {
+									articleChar = '<span style="color:blue">' + articleChar + '</span>';
+									this.scores += 1;
+								} else {
+									articleChar = '<span style="color:red">' + articleChar + '</span>';
+
+								}
+								// console.log(this.display)
+								this.display = this.display + articleChar;
+								// console.log(this.article.slice(this.input.length,this.article.length));
+
+							}
+							this.display = this.display+ this.article.slice(this.input.length,this.article.length);
+						}
+					}
+				});
+			</script>
+		</footer>
+</body>
+</html>
