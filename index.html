@@ -1,33 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="UTF-8">
-		<title>Document</title>
-		<meta name="viewport" content="width=device-width, initial-scale=1">
 
-		<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css" rel="stylesheet">
+    <link href="css/metro.css" rel="stylesheet">
+    <link href="css/metro-icons.css" rel="stylesheet">
+    <link href="css/metro-responsive.css" rel="stylesheet">
+    <script src="js/vue.js"></script>
+    <script src="js/vue-resource.min.js"></script>
+</head>
 
-	    <link href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css" rel="stylesheet">
-	    <link href="css/metro.css" rel="stylesheet">
-	    <link href="css/metro-icons.css" rel="stylesheet">
-	    <link href="css/metro-responsive.css" rel="stylesheet">
-		<script src="js/vue.js"></script>
-		<script src="js/vue-resource.min.js"></script>
-	</head>
 <body class="bg-darkTeal">
-	<div class="container" id='app'>
-			<div class="row">
-			
-			
-				<div class="col-xs-10 col-md-10" style="height: 50px;">
-					<h3><div>
+    <div class="container" id='app'>
+        <div class="row">
+            <div class="col-xs-10 col-md-10" style="height: 50px;">
+                <h3><div>
 							<span class="tag tag-pill tag-info">
 								計時:{{countDownTime}}
 							</span>
 
 							<div class="pull-right">
 							<span class="tag tag-pill tag-info">
-								得分:{{scores}}
+								得分:{{totalScores}}
 							</span>
 							<span class="tag tag-pill tag-info">
 								速度:{{typingRate}}字/分
@@ -35,181 +33,191 @@
 							</div>
 						</div>
 					</h3>
-				</div>
-
-
-				<div class="col-xs-10 col-md-10 bg-grayLighter padding10 block-shadow" style="border:solid 2px white; border-radius: 5px;" >
-					<!-- <div class="bg-white" style="width: 100%; height: 80%"> -->
-							<div class="panel">
-								<div class="heading bg-lightOrange fg-darkCobalt" style="font-family:DFKai-sb,標楷體;">
-									中文打字練習 
-								</div>
-							</div>
-					<!-- </div> -->
-
-					<span style="font-family:DFKai-sb,標楷體;">
+            </div>
+            <div class="col-xs-10 col-md-10 bg-grayLighter padding10 block-shadow" style="border:solid 2px white; border-radius: 5px;">
+                <!-- <div class="bg-white" style="width: 100%; height: 80%"> -->
+                <div class="panel">
+                    <div class="heading bg-lightOrange fg-darkCobalt" style="font-family:DFKai-sb,標楷體;">
+                        中文打字練習
+                    </div>
+                </div>
+                <!-- </div> -->
+                <span style="font-family:DFKai-sb,標楷體;">
 
 						<span v-html="focusArticle" class="text-light" style=" font-size: 1em;">focusArticle</span>
-						 <i v-if="focusArticle.length>0" class="fa fa-hand-o-down" aria-hidden="true"></i>
-						 {{focusArticle.length}}
-						<!-- 
+                <i v-if="focusArticle.length>0" class="fa fa-hand-o-down" aria-hidden="true"></i>
+                <!-- {{focusArticle.length}} -->
+                <!-- 
 						<span v-if="focusArticle.length>0" v-html="focusArticle" class="text-light">focusArticle</span>
 						<span v-else>{{article}}</span>
 						 -->
-					</span>
-
-					
-<!-- 
+                </span>
+                <!-- 
 					<textarea v-bind:value="input" v-on:input="input = $event.target.value" @keyup.enter="nextLine" @keyup="reFreshPage" :disabled="!isEditable" style="width: 97%; height: 200px; resize: none;">
 					</textarea>
 
  -->
-					 <br/>
-					 <textarea v-bind:value="input" v-on:input="input = $event.target.value" @keyup.enter="nextLine" @keyup="reFreshPage" :disabled="!isEditable" style="width: 97%; height: 50px; resize: none;">
-					 </textarea>
+                <br/>
+                <textarea v-bind:value="input" v-on:input="input = $event.target.value" @keyup.enter="nextLine" @keyup="reFreshPage" :disabled="!isEditable" style="width: 97%; height: 50px; resize: none;">
+                </textarea>
+            </div>
+        </div>
+    </div>
+    <footer>
+        <script>
+        "use strict";
+
+        var vm = new Vue({
+            el: "#app",
+            data: {
+                input: '',
+                article: '周五夜不當循行平常的生活路線，心思視野總歡喜在綠園道上行走。月出，星還在路上，寬闊草原人潮仍未聚集，遊人散坐一旁階梯，滑手機或聊天，街頭藝人各占據點架設麥克風，電吉他錚錚撥出零散試音，音箱被抬至合適位置，仰天、相對或分開些！夜氛未濃，七點過後台上旋音仍然鬆散，兩位主唱嗓音未開，左調麥克風右轉接頭，提袋裡的小瑪爾濟斯屢要逃出，名喚D的年輕歌者一次次起身將牠拉回。旋律慵懶，忙碌與休閒未能順接，路人三兩經過，各方狗兒陸續登場。拉不拉多犬晃動一身棕土色厚毛，咧嘴吐舌微笑著，小博美輕靈快步，約克夏自另一頭蹦來，輕繩抑不住躁動，被關禁了整星期就等這刻。',
+                focusArticle: '',
+                focusLineCollect: [],
+                focusCurrentLine: 0,
+                scores: 0,
+                // position: 0,
+                recallCharsLength: 10,
+                countDownTime: 60,
+                duration: 0,
+                isEditable: true,
+                typingSpeed: 0
+            },
+            created: function() {
+                // let self = this;
+                let lineLength = 35;
+                if (this.article.length > 0) {
+                    for (let i = 0; i < Math.ceil(this.article.length / lineLength); i++) {
+                        let obj = {
+                            str: String,
+                            scores: 0
+                        }
+                        obj.str = this.article.slice(i * lineLength, (i * lineLength) + lineLength);
+                        // console.log(this.focusLineObj.str);
+
+                        obj.scores = 0;
+                        this.focusLineCollect.push(obj);
+                    }
+                }
+                // console.log(this.focusLieCnollect);
+                this.focusArticle = this.focusLineCollect[0].str;
+
+                //時間計算
+                let i = this.countDownTime;
+                let j = this.duration;
+                let isEditable = this.isEditable;
+                const intervalId = setInterval(function() {
+                    // console.log(i);
+                    Vue.set(vm, 'countDownTime', i);
+                    Vue.set(vm, 'duration', j);
+                    i--;
+                    j++;
+                    if (i < 0) {
+
+                        Vue.set(vm, 'isEditable', false);
+                        clearInterval(intervalId);
+
+                    }
+                    // console.log(this.$data.countDownTime);
+                }, 1000);
+
+            },
+            computed: {
+                //計算打字速度
+                typingRate: function() {
+                    if (this.input.length != 0 && this.input.length % 5 == 0) {
+                        this.typingSpeed = (this.position / this.duration);
+
+                    }
+                    return (this.typingSpeed * 60).toFixed(2);
+
+                },
+                totalScores: function() {
+                	let sum = 0;
+                	for (var i = 0; i < this.focusLineCollect.length; i++) {
+			            sum = sum + this.focusLineCollect[i].scores;
+                	}
+                	return sum;
+
+                }
+
+            },
+            methods: {
+                isMatch: function(articleChar, inputChar) {
+                	let obj = {
+                		char: new String(),
+                		expression: new Boolean() 
+                	}
+
+                    if (articleChar === inputChar) {
+                        articleChar = '<span style="color:blue">' + articleChar + '</span>';
+                        obj.expression = true;
+                    } else {
+                        articleChar = '<span style="color:red">' + articleChar + '</span>';
+                        obj.expression = false;
+
+                    }
+                    obj.char = articleChar;
+
+                    return obj;
 
 
+                },
+                nextLine: function() {
+                    this.focusCurrentLine++;
+                    this.focusArticle = this.focusLineCollect[this.focusCurrentLine].str;
+                    this.input = '';
 
- 				</div>		
+                },
+                reFreshPage: function() {
+                    this.focusArticle = '';
+                    this.position = this.input.length;
+                    this.isEditable = this.position >= this.article.length ? false : true
+                        // console.log(this.position);
+                    // this.scores = 0;
+                    // this.display = '';
 
-			</div>		
-	</div>
+                    this.input = this.input.replace(/(,|\.)/g, function(v) {
+                        if (v === ',') {
+                            return '，'
+                        };
+                        if (v === '.') {
+                            return '。'
+                        };
+                        if (v === '!') {
+                            return '！'
+                        };
+                        if (v === ' ') {
+                            return '▇'
+                        };
 
+                       
+                    });
+                 
+                    let recallInputChars = this.input.slice(0, this.input.length);
+                    let recallArticleChars = this.focusLineCollect[this.focusCurrentLine].str.slice(0, this.input.length);
 
-	<footer>
-		<script>
-			"use strict";
+                   //每一次輸入事件都是重頭計算, 分數永遠由０開始
+                   this.focusLineCollect[this.focusCurrentLine].scores = 0;
+                    // console.log(recallArticleChars.length);
+                    for (let i = 0; i < recallInputChars.length; i++) {
+                    	let obj = this.isMatch(recallArticleChars[i], recallInputChars[i]);
+                    	// console.log(obj)
+                    	if (obj.expression) {
+                    		// console.log(recallInputChars[i]);
+                    		this.focusLineCollect[this.focusCurrentLine].scores++ ;
+                    	}
+                    	let displayChar = obj.char;
+                        this.focusArticle = this.focusArticle + displayChar;
 
-			var vm = new Vue({
-				el: "#app",
-				data: {
-					input:'',
-					article:'周五夜不當循行平常的生活路線，心思視野總歡喜在綠園道上行走。月出，星還在路上，寬闊草原人潮仍未聚集，遊人散坐一旁階梯，滑手機或聊天，街頭藝人各占據點架設麥克風，電吉他錚錚撥出零散試音，音箱被抬至合適位置，仰天、相對或分開些！夜氛未濃，七點過後台上旋音仍然鬆散，兩位主唱嗓音未開，左調麥克風右轉接頭，提袋裡的小瑪爾濟斯屢要逃出，名喚D的年輕歌者一次次起身將牠拉回。旋律慵懶，忙碌與休閒未能順接，路人三兩經過，各方狗兒陸續登場。拉不拉多犬晃動一身棕土色厚毛，咧嘴吐舌微笑著，小博美輕靈快步，約克夏自另一頭蹦來，輕繩抑不住躁動，被關禁了整星期就等這刻。',
-					focusArticle:'',
-					focusLineCollect: [],
-					focusCurrentLine: 0,
-					// display:'',
-					scores: 0,
-					// position: 0,
-					recallCharsLength:10,
-					countDownTime: 60,
-					duration: 0,
-					isEditable: true,
-					typingSpeed: 0
-				},
-				created: function() {
-					// let self = this;
-					let lineLength = 45;
-					if (this.article.length>0) {
-						for (let i = 0; i < Math.ceil(this.article.length/lineLength); i++) {
-							this.focusLineCollect[i] = this.article.slice(i*lineLength,(i*lineLength)+lineLength);
-						}
-					}
-					this.focusArticle = this.focusLineCollect[0] ;
-					let i = this.countDownTime ;
-					let j = this.duration;
-					let isEditable = this.isEditable;
-					const intervalId = setInterval(function(){
-						// console.log(i);
-						Vue.set(vm,'countDownTime',i);
-						Vue.set(vm,'duration',j);
-						i--;
-						j++;
-						if (i<0) {
-
-							Vue.set(vm,'isEditable',false);
-							clearInterval(intervalId);
-							
-						}
-						// console.log(this.$data.countDownTime);
-					},1000);
-
-				},
-				computed:{
-					typingRate: function(){
-						if (this.input.length!=0 && this.input.length %5 == 0) {
-							this.typingSpeed = (this.position/this.duration);
-
-						} 
-						return (this.typingSpeed*60).toFixed(2);
-
-					}
-
-				},
-				methods: {
-					isMatch: function(articleChar,inputChar, shouldScore = false){
-
-						if (articleChar === inputChar) {
-									articleChar = '<span style="color:blue">' + articleChar + '</span>';
-									if(shouldScore){
-										this.scores += 1;
-									}
-								} else {
-									articleChar = '<span style="color:red">' + articleChar + '</span>';
-
-								}
-						return articleChar;
-
-
-					},
-					nextLine: function(){
-						this.focusCurrentLine++;
-						this.focusArticle = this.focusLineCollect[this.focusCurrentLine];
-						this.input = '';
-
-					},
-					reFreshPage: function() {
-							this.focusArticle ='';
-							this.position = this.input.length;
-							this.isEditable =  this.position >= this.article.length? false : true
-							// console.log(this.position);
-							this.scores = 0;
-							// this.display = '';
-
-							let output = this.input.replace(/(,|\.)/g,function(v){
-								if (v===',') {return '，'};
-								if (v==='.') {return '。'};
-								if (v==='!') {return '！'};
-							});
-							this.input = output;
-							// console.log(this.input.length+':'+this.input);
-
-							let recallInputChars = new String();
-							let recallArticleChars = new String();
-
-							for (let i = 0; i < this.input.length; i++) {
-
-								//計算積分
-								let articleChar = this.focusLineCollect[this.focusCurrentLine]; //要改為參照focusLineCollect[];
-								let inputChar = this.input.slice(i,i+1);
-								articleChar = this.isMatch(articleChar,inputChar,true);
-
-								//簡潔題目-兩三行
-								// if (i > this.recallCharsLength) {
-								// 	recallInputChars = this.input.slice(i-this.recallCharsLength,i+this.recallCharsLength);
-								// 	recallArticleChars = this.article.slice(i-this.recallCharsLength,i+this.recallCharsLength);
-								// } else {
-									recallInputChars = this.input.slice(0,this.input.length);
-									recallArticleChars = this.article.slice(0,this.input.length);
-
-								// }
-
-
-							}
-
-// console.log(recallArticleChars.length);
-							for (let i = 0; i < recallInputChars.length; i++) {
-								let displayChar = this.isMatch(recallArticleChars[i],recallInputChars[i]);
-								// console.log(displayChar)
-									this.focusArticle = this.focusArticle + displayChar ;
-
-							}
-							this.focusArticle = this.focusArticle + this.focusLineCollect[this.focusCurrentLine].slice(this.input.length);
-							// this.display = this.display + this.article.slice(this.input.length,this.article.length);
-						}
-					}
-				});
-			</script>
-		</footer>
+                    }
+                    this.focusArticle = this.focusArticle + this.focusLineCollect[this.focusCurrentLine].str.slice(this.input.length);
+                    // console.log(this.focusLineCollect[this.focusCurrentLine].scores);
+                }
+            }
+        });
+        </script>
+    </footer>
 </body>
+
 </html>
