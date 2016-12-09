@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css" rel="stylesheet">
+    <link href="css/metro.css" rel="stylesheet">
+    <link href="css/metro-icons.css" rel="stylesheet">
+    <link href="css/metro-responsive.css" rel="stylesheet">
+    <script src="js/vue.js"></script>
+    <script src="js/vue-resource.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/axios/0.15.3/axios.min.js"></script>
+</head>
+
+<body class="bg-black fg-white">
+    <div class="container" id='app'>
+    </div>
+    <footer>
+        <script>
+        "use strict";
+
+        var vm = new Vue({
+        	    el: '#app',
+                template: '<div>{{ msg }}</div>',
+                data: {
+                    // declare message with an empty value
+                    msg: 'hello'
+                },
+                created: function(){
+                	// this.say();
+                	this.fetchData();
+
+                },
+                methods:{
+                	say: function() {
+                		this.msg = 'world';
+                	},
+                	fetchData: function() {
+                		this.$http.get('data.php').then(response => {
+                			this.msg = response.data.article;
+
+                		});
+
+                	}
+
+                }
+            })
+        </script>
+    </footer>
+</body>
+
+</html>

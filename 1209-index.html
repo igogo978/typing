@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css" rel="stylesheet">
+    <link href="css/metro.css" rel="stylesheet">
+    <link href="css/metro-icons.css" rel="stylesheet">
+    <link href="css/metro-responsive.css" rel="stylesheet">
+    <script src="js/vue.js"></script>
+    <script src="js/vue-resource.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/axios/0.15.3/axios.min.js"></script>
+</head>
+
+<body class="bg-darkTeal">
+    <div class="container" id='app'>
+        <div class="row">
+            <div class="col-xs-10 col-md-10" style="height: 50px;">
+                <h3><div>
+							<span class="tag tag-pill tag-info">
+								計時:{{countDownTime}}
+							</span>
+
+							<div class="pull-right">
+							<span class="tag tag-pill tag-info">
+								得分:{{totalScores}}
+							</span>
+							<span class="tag tag-pill tag-info">
+								速度:{{typingRate}}字/分
+							</span>
+							</div>
+						</div>
+					</h3>
+            </div>
+            <div class="col-xs-10 col-md-10 bg-grayLighter padding10 block-shadow" style="border:solid 2px white; border-radius: 5px;">
+                <!-- <div class="bg-white" style="width: 100%; height: 80%"> -->
+                <div class="panel">
+                    <div class="heading bg-lightOrange fg-darkCobalt" style="font-family:DFKai-sb,標楷體;">
+                        中文打字練習
+                    </div>
+                </div>
+                <!-- </div> -->
+                <span style="font-family:DFKai-sb,標楷體;">
+
+						<span v-html="focusArticle" class="text-light" style=" font-size: 1em;">focusArticle</span>
+                <i v-if="focusArticle.length>0" class="fa fa-hand-o-down" aria-hidden="true"></i>
+                <!-- {{focusArticle.length}} -->
+                <!-- 
+						<span v-if="focusArticle.length>0" v-html="focusArticle" class="text-light">focusArticle</span>
+						<span v-else>{{article}}</span>
+						 -->
+                </span>
+                <!-- 
+					<textarea v-bind:value="input" v-on:input="input = $event.target.value" @keyup.enter="nextLine" @keyup="reFreshPage" :disabled="!isEditable" style="width: 97%; height: 200px; resize: none;">
+					</textarea>
+
+ -->
+                <br/>
+                <textarea v-bind:value="input" v-on:input="input = $event.target.value" @keyup.enter="nextLine" @keyup="reFreshPage" :disabled="!isEditable" style="width: 97%; height: 50px; resize: none;">
+                </textarea>
+            </div>
+        </div>
+    </div>
+    <footer>
+        <script>
+		  "use strict";
+
+		           var vm = new Vue({
+            el: "#app",
+            data: {
+                input: '',
+                article: String('12345'),
+                focusArticle: '',
+                focusLineCollect: [],
+                currentLine: 0,
+                scores: 0,
+                // position: 0,
+                recallCharsLength: 10,
+                countDownTime: 60,
+                duration: 0,
+                isEditable: true,
+                typingSpeed: 0
+            },
+            created: function() {
+
+            	// this.fetchData(); 
+               let lineLength = 35;
+                if (this.article.length > 0) {
+                    for (let i = 0; i < Math.ceil(this.article.length / lineLength); i++) {
+                        let obj = {
+                            str: String,
+                            scores: 0
+                        }
+                        obj.str = this.article.slice(i * lineLength, (i * lineLength) + lineLength);
+                        // console.log(this.focusLineObj.str);
+
+                        obj.scores = 0;
+                        this.focusLineCollect.push(obj);
+                    }
+                }
+                // console.log(this.focusLieCnollect);
+                this.focusArticle = this.focusLineCollect[0].str;
+
+                //時間計算
+                let i = this.countDownTime;
+                let j = this.duration;
+                let isEditable = this.isEditable;
+                const intervalId = setInterval(function() {
+                    // console.log(i);
+                    Vue.set(vm, 'countDownTime', i);
+                    Vue.set(vm, 'duration', j);
+                    i--;
+                    j++;
+                    if (i < 0) {
+
+                        Vue.set(vm, 'isEditable', false);
+                        clearInterval(intervalId);
+
+                    }
+                    // console.log(this.$data.countDownTime);
+                }, 1000);
+
+            },
+            computed: {
+                //計算打字速度
+                typingRate: function() {
+                    if (this.input.length != 0 && this.input.length % 5 == 0) {
+                        this.typingSpeed = (this.position / this.duration);
+
+                    }
+                    return (this.typingSpeed * 60).toFixed(2);
+
+                },
+                totalScores: function() {
+                	let sum = 0;
+                	for (var i = 0; i < this.focusLineCollect.length; i++) {
+			            sum = sum + this.focusLineCollect[i].scores;
+                	}
+                	return sum;
+
+                }
+
+            },
+            methods: {
+            	fetchData: function() {
+            		var self=this;
+            		  // GET /someUrl
+           		 		this.$http.get('data.php').then((response) => {
+							 self.article = response.data.article;
+            	// Vue.set(this,'article',response.data.article);
+					console.log(self.article);
+							// console.log(response.data.article)
+					    // success callback
+					}, (response) => {
+				    // error callback
+				    vm.article = error;
+					});
+
+            	},
+                isMatch: function(articleChar, inputChar) {
+                	let obj = {
+                		char: new String(),
+                		expression: new Boolean() 
+                	}
+
+                    if (articleChar === inputChar) {
+                        articleChar = '<span style="color:blue">' + articleChar + '</span>';
+                        obj.expression = true;
+                    } else {
+                        articleChar = '<span style="color:red">' + articleChar + '</span>';
+                        obj.expression = false;
+
+                    }
+                    obj.char = articleChar;
+
+                    return obj;
+
+
+                },
+                nextLine: function() {
+                    this.currentLine++;
+                    this.focusArticle = this.focusLineCollect[this.currentLine].str;
+                    this.input = '';
+
+                },
+                reFreshPage: function() {
+                	// this.fetchData();
+                    this.focusArticle = '';
+                    this.position = this.input.length;
+                    this.isEditable = this.position >= this.article.length ? false : true
+                        // console.log(this.position);
+                    // this.scores = 0;
+                    // this.display = '';
+
+                    this.input = this.input.replace(/(,|\.)/g, function(v) {
+                        if (v === ',') {
+                            return '，'
+                        };
+                        if (v === '.') {
+                            return '。'
+                        };
+                        if (v === '!') {
+                            return '！'
+                        };
+                        if (v === ' ') {
+                            return '▇'
+                        };
+
+                       
+                    });
+                 
+                    let recallInputChars = this.input.slice(0, this.input.length);
+                    let recallArticleChars = this.focusLineCollect[this.currentLine].str.slice(0, this.input.length);
+
+                   //每一次輸入事件都是重頭計算, 分數永遠由０開始
+                   this.focusLineCollect[this.currentLine].scores = 0;
+                    // console.log(recallArticleChars.length);
+                    for (let i = 0; i < recallInputChars.length; i++) {
+                    	let obj = this.isMatch(recallArticleChars[i], recallInputChars[i]);
+                    	// console.log(obj)
+                    	if (obj.expression) {
+                    		// console.log(recallInputChars[i]);
+                    		this.focusLineCollect[this.currentLine].scores++ ;
+                    	}
+                    	let displayChar = obj.char;
+                        this.focusArticle = this.focusArticle + displayChar;
+
+                    }
+                    this.focusArticle = this.focusArticle + this.focusLineCollect[this.currentLine].str.slice(this.input.length);
+                    // console.log(this.focusLineCollect[this.currentLine].scores);
+                }
+            }
+        });
+Vue.set(vm,'article',"hello");
+// console.log('hello')
+
+        </script>
+    </footer>
+</body>
+
+</html>
