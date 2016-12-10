@@ -46,11 +46,13 @@
                 </div>
             </div>
             <span style="font-family:DFKai-sb,標楷體;">
-                {{focusArticle}}
+                <span v-html="focusArticle" class="text-light" style=" font-size: 1em;">
+                </span>
+            <span v-html="endOfLine"> end of the line (enter key icon) </span>
             </span>
             <br/>
             <br/>
-            <textarea v-bind:class="{ 'bg-dark':isEditable, 'fg-white':isEditable, 'bg-gray':!isEditable }"  v-bind:value="inputText" v-on:input="inputText = $event.target.value" :disabled="!isEditable" @keyup.enter="nextLine" style="width: 97%; height: 50px; resize: none; boarder:solid 1px gray;">
+            <textarea v-bind:class="{ 'bg-dark':isEditable, 'fg-white':isEditable, 'bg-gray':!isEditable }" v-bind:value="inputText" v-on:input="inputText = $event.target.value" :disabled="!isEditable" @keyup.enter="nextLine" @keyup="refreshPage" style="width: 97%; height: 50px; resize: none; boarder:solid 1px gray;">
             </textarea>
         </div>
     </div>
@@ -66,6 +68,7 @@
                 article: null,
                 focusArticle: null,
                 focusLineCollect: [],
+                inputTextCollect: [],
                 currentLine: 0,
                 lineLength: 40,
                 isEditable: true,
@@ -76,6 +79,20 @@
             },
             mounted: function() {
                 console.log('mounted');
+
+            },
+            computed: {
+                endOfLine: function() {
+                    // console.log(this.focusArticle);
+                    let eof;
+                    if (this.focusArticle) {
+                        eof = '<i class="fa fa-hand-o-down" aria-hidden="true"></i>';
+                    } else {
+                        eof = "error, the article is null.";
+
+                    }
+                    return eof;
+                }
 
             },
             watch: {
@@ -91,10 +108,8 @@
                             }
 
                             obj.str = this.article.slice(i * this.lineLength, (i * this.lineLength) + this.lineLength);
-                            // console.log(obj.str)
-                                // console.log(this.focusLineObj.str);
-
                             obj.scores = 0;
+
                             this.focusLineCollect.push(obj);
 
                         }
@@ -104,7 +119,6 @@
                 }
 
             },
-            computed: {},
             methods: {
                 fetchData: function() {
                     this.$http.get('data.php').then(response => {
@@ -113,15 +127,88 @@
 
                 },
                 nextLine: function() {
-                        this.currentLine++;
+                    //輸入行資料存入array
+                    this.inputTextCollect[this.currentLine] = this.inputText;
+                    // console.log(this.inputTextCollect[this.currentLine]);
+
+                    this.currentLine++;
                     if (this.currentLine < this.focusLineCollect.length) {
-                        console.log(this.currentLine);
+                        //更新焦點行內容 
                         this.focusArticle = this.focusLineCollect[this.currentLine].str;
-                        this.input = '';
+                        this.inputText = '';
                     } else {
                         this.isEditable = false;
                     }
 
+                },
+                refreshPage: function() {
+                    // console.log(this.inputText.length);
+                    this.focusArticle = '';
+
+                    //任何鍵盤事件都會引發replace, 所以必須確保非null
+                    if (this.inputText != null) {
+                        this.replacePunctuation();
+                    }
+
+                    //輸入字串長度與取出該行題目字串長度一字一字比對,計算得分與標顏色
+                    let recallInputChars = this.inputText.slice(0, this.inputText.length);
+                    let recallArticleChars = this.focusLineCollect[this.currentLine].str.slice(0, this.inputText.length);
+
+                    //每一次輸入事件都是重頭計算, 分數永遠由０開始
+                    this.focusLineCollect[this.currentLine].scores = 0;
+                    // console.log(recallArticleChars.length);
+                    for (let i = 0; i < recallInputChars.length; i++) {
+                        let obj = this.isMatch(recallArticleChars[i], recallInputChars[i]);
+                        // console.log(obj)
+                        if (obj.expression) {
+                            // console.log(recallInputChars[i]);
+                            this.focusLineCollect[this.currentLine].scores++;
+                        }
+                        let displayChar = obj.char;
+                        this.focusArticle = this.focusArticle + displayChar;
+
+                    }
+                    this.focusArticle = this.focusArticle + this.focusLineCollect[this.currentLine].str.slice(this.inputText.length);
+                    console.log(this.focusLineCollect[this.currentLine].scores);
+
+
+
+                },
+                isMatch: function(articleChar, inputChar) {
+                    let obj = {
+                        char: new String(),
+                        expression: new Boolean()
+                    }
+
+                    if (articleChar === inputChar) {
+                        articleChar = '<span class="fg-blue">' + articleChar + '</span>';
+                        obj.expression = true;
+                    } else {
+                        articleChar = '<span style="color:red">' + articleChar + '</span>';
+                        obj.expression = false;
+
+                    }
+                    obj.char = articleChar;
+
+                    return obj;
+
+
+                },
+                replacePunctuation: function(str) { //置換符號
+                    this.inputText = this.inputText.replace(/(\.|\s)/, function(v) {
+                        if (v === ',') {
+                            return '，'
+                        };
+                        if (v === '.') {
+                            return '。'
+                        };
+                        if (v === '!') {
+                            return '！'
+                        };
+                        if (v === ' ') {
+                            return '▇'
+                        };
+                    });
                 },
             }
         });
