@@ -14,58 +14,63 @@
     <script src="js/vue-resource.min.js"></script>
 </head>
 
-<body class="bg-grayLighter fg-grayLighter">
+<body class="bg-grayLighter fg-grayLighter" oncontextmenu="return false" ; onkeydown="if(((event.shiftKey) && (event.keyCode==121)) || event.altKey || event.keyCode==116 || (event.altKey && event.keyCode==115) || (event.keyCode==78 && event.ctrlKey) || ((event.ctrlKey) && (event.keyCode==86))) return false;" ondrag="return false;" onpaste="return false;" onselectstart="return false;" onselect="document.selection.empty();" oncopy="document.selection.empty();" onbeforecopy="return false;">
     <div class="container" id='app'>
         <div class="row">
+            <div class="row col-xs-1 col-md-1">
+            </div>
             <div class="col-xs-10 col-md-10" style="height: 50px;">
                 <h3>
                     <div>
+                        <span class="tag tag-pill tag-info bg-darkCobalt fg-white">
+                            計時:  {{contestTime}}
+                        </span>
 
+                        <div class="pull-right">
                             <span class="tag tag-pill tag-info bg-darkCobalt fg-white">
-                                計時:  {{contestTime}}
+                                得分:  {{totalScores}} 
                             </span>
-
-                            <div class="pull-right">
-                                <span class="tag tag-pill tag-info bg-darkCobalt fg-white">
-                                    得分:  {{totalScores}} 
-                                </span>
-                                <span class="tag tag-pill tag-info bg-darkCobalt fg-white">
-                                    正確率:  {{typingAccuracy}} 
-                                </span>
-                                <span class="tag tag-pill tag-info bg-darkCobalt fg-white">
-                                    {{typingRate}} 字/分
-                                </span>
-                            </div>
+                            <span class="tag tag-pill tag-info bg-darkCobalt fg-white">
+                                正確率:  {{typingAccuracy}} 
+                            </span>
+                            <span class="tag tag-pill tag-info bg-darkCobalt fg-white">
+                                {{typingRate}} 字/分
+                            </span>
+                        </div>
 
                     </div>
-
                 </h3>
             </div>
         </div>
-        <div class="col-xs-10 col-md-10 bg-black padding10 block-shadow" style="border:solid 2px gray; border-radius: 5px;">
-            <div class="panel">
-                <div class="heading bg-darkBlue fg-grayLighter" style="font-family:DFKai-sb,標楷體;">
-                    中文打字練習
-                </div>
+        <div class="row">
+            <div class="row col-xs-1 col-md-1">
             </div>
-            <span style="font-family:DFKai-sb,標楷體;">
-                <div v-if="focusLineCollect[currentLine-1]">
-                    <span v-html="focusLineCollect[currentLine-1].str" style="font-size: 1em; border-color: gray; border-bottom-style:dashed; ">
+            <div class="col-xs-10 col-md-10 bg-black padding10 block-shadow" style="border:solid 2px gray; border-radius: 5px;">
+                <div class="panel">
+                    <div class="heading bg-darkBlue fg-grayLighter" style="font-family:DFKai-sb,標楷體;">
+                        中文打字練習
+                    </div>
+                </div>
+                <span style="font-family:DFKai-sb,標楷體;">
+                    <div v-if="focusLineCollect[currentLine-1]">
+                        <span v-html="focusLineCollect[currentLine-1].str" style="font-size: 1em; border-color: gray; border-bottom-style:dashed; ">
+                        </span>
+            </div>
+            <br/>
+            <span v-html="focusArticle" class="text-light" style=" font-size: 1em;">
                     </span>
-        </div>
-        <br/>
-        <span v-html="focusArticle" class="text-light" style=" font-size: 1em;">
-                </span>
-        <span v-html="endOfLine"> end of the line (enter key icon) </span>
-        </span>
-        <br/>
-        <textarea v-bind:class="{ 'bg-dark':isEditable, 'fg-white':isEditable, 'bg-gray':!isEditable }" v-bind:value="inputText" v-on:input="inputText = $event.target.value" :disabled="!isEditable" v-on:click="timerCountdown" @keyup.enter="nextLine" @keyup="refreshPage" placeholder='' style="width: 97%; height: 22px; resize: none; boarder:solid 1px gray; font-family:DFKai-sb,標楷體;">
-        </textarea>
-        <br/>
-        <br/>
-        <div v-if="focusLineCollect[currentLine+1]">
-            <span v-html="focusLineCollect[currentLine+1].str" style="font-size: 1em; font-family:DFKai-sb,標楷體; border-color: gray; border-bottom-style:dashed; ">
-                    </span>
+            <span v-html="endOfLine"> end of the line (enter key icon) </span>
+            </span>
+            </span>
+            <br/>
+            <textarea v-bind:class="{ 'bg-dark':isEditable, 'fg-white':isEditable, 'bg-gray':!isEditable }" v-bind:value="inputText" v-on:input="inputText = $event.target.value" :disabled="!isEditable" v-on:click="timerCountdown" @keyup="refreshPage" placeholder='' style="width: 97%; height: 22px; resize: none; boarder:solid 1px gray; font-family:DFKai-sb,標楷體;">
+            </textarea>
+            <br/>
+            <br/>
+            <div v-if="focusLineCollect[currentLine+1]">
+                <span v-html="focusLineCollect[currentLine+1].str" style="font-size: 1em; font-family:DFKai-sb,標楷體; border-color: gray; border-bottom-style:dashed; ">
+                   </span>
+            </div>
         </div>
     </div>
     </div>
@@ -126,7 +131,6 @@
                     }
                     this.accuracy = (this.totalScores / totalInputTextLength) * 100;
 
-
                     if (totalInputTextLength === 0 || this.duration === 0 || this.totalScores === 0) {
                         this.accuracy = 0;
                     }
@@ -137,18 +141,19 @@
                 },
                 //計算打字速度
                 typingRate: function() { //每五秒為單位
+                    // console.log(this.inputText.length);
                     let totalInputTextLength = this.inputText.length;
                     if (this.inputTextCollect.length > 0) {
                         // console.log(this.inputTextCollect.length)
                         for (let i = 0; i < this.inputTextCollect.length; i++) {
                             // console.log(i + ':' + this.inputTextCollect[i]);
                             // console.log(this.inputTextCollect[i] + ':' + this.inputTextCollect[i].length);
-                            let lineLength = this.inputTextCollect[i].length - 1; //最後一個長度為enter
+                            let lineLength = this.inputTextCollect[i].length; 
                             totalInputTextLength = totalInputTextLength + lineLength;
                         }
-                        // console.log(totalInputTextLength);
 
                     }
+                        console.log(totalInputTextLength);
                     // console.log(totalInputTextLength);
                     this.wordsPerMinutes = (totalInputTextLength / this.duration) * 60;
                     if (totalInputTextLength === 0 || this.duration === 0) {
@@ -193,6 +198,11 @@
 
             },
             methods: {
+                greet: function(event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+
+                },
                 timerCountdown: function() {
                     // console.log(this.hasBegun);
                     if (this.hasBegun == false) { //hasBeun: false  還沒開始
@@ -245,7 +255,19 @@
 
                 },
 
-                refreshPage: function() {
+                refreshPage: function(event) {
+                    // console.log(event.keyCode);
+                    if (event.keyCode === 38) {
+                        console.log('previous line');
+                    }
+                    if (event.keyCode === 40) {
+                        this.nextLine();
+                    }
+                    if (event.keyCode === 13) {
+                        // console.log(this.inputText.length);
+                        this.inputText = this.inputText.slice(0,this.inputText.length-1); //last char is enter
+                        this.nextLine();
+                    }
 
                     //任何鍵盤事件都會引發refreshPage, 所以必須確保非null
                     if (this.inputText != null) {
@@ -300,7 +322,7 @@
 
                 },
                 replacePunctuation: function(str) { //置換符號
-                    this.inputText = this.inputText.replace(/(\[|\]|:|,|\.)/, function(v) {
+                    this.inputText = this.inputText.replace(/(\[|\]|:|;|,|\.)/, function(v) {
                         if (v === ',') {
                             return '，'
                         };
@@ -321,6 +343,9 @@
                         };
                         if (v === ':') {
                             return '：'
+                        };
+                        if (v === ';') {
+                            return '；'
                         };
                     });
                 },
