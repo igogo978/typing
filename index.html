@@ -84,6 +84,7 @@
         <script>
         "use strict";
 
+        Vue.http.options.emulateJSON = true;
         var vm = new Vue({
             el: "#app",
             data: {
@@ -233,8 +234,13 @@
 
                 },
                 fetchData: function() {
-                    this.$http.get('data.php').then(response => {
-                        this.article = response.data.article;
+                    this.$http.post('data.php',{
+                        foo: 'bar'
+                    }).then(response => {
+                        this.article = decodeURIComponent(response.data.article);
+                        console.log(response.data.article);
+
+                        // console.log(this.article);
                     });
 
                 },
