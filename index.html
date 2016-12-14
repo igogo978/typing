@@ -42,35 +42,40 @@
                 </h3>
             </div>
         </div>
-        <div class="row">
+        <div class="row" style="font-family:DFKai-sb,標楷體; font-size: 1.3em;">
             <div class="row col-xs-1 col-md-1">
             </div>
             <div class="col-xs-10 col-md-10 bg-black padding10 block-shadow" style="border:solid 2px gray; border-radius: 5px;">
                 <div class="panel">
-                    <div class="heading bg-darkBlue fg-grayLighter" style="font-family:DFKai-sb,標楷體;">
+                    <div class="heading bg-darkBlue fg-grayLighter">
                         中文打字練習
                     </div>
                 </div>
-                <span style="font-family:DFKai-sb,標楷體;">
-                    <div v-if="focusLineCollect[currentLine-1]">
-                        <span v-html="focusLineCollect[currentLine-1].str" style="font-size: 1em; border-color: gray; border-bottom-style:dashed; ">
-                        </span>
-            </div>
-            <br/>
-            <span v-html="focusArticle" class="text-light" style=" font-size: 1em;">
+               
+                <div v-if="focusArticle[currentLine-1]">
+                    <span v-html="focusArticle[currentLine-1]" style="border-color: gray; border-bottom-style:dashed; ">
                     </span>
+                </div>
+            <br/>
+            <!-- 中心行 即目前打字區域 -->
+            <span v-html="focusArticle[currentLine]" class="text-light">
+            </span>
             <span v-html="endOfLine"> end of the line (enter key icon) </span>
             </span>
-            </span>
             <br/>
-            <textarea v-bind:class="{ 'bg-dark':isEditable, 'fg-white':isEditable, 'bg-gray':!isEditable }" v-bind:value="inputText" v-on:input="inputText = $event.target.value" :disabled="!isEditable" v-on:click="timerCountdown" @keyup="refreshPage" placeholder='' style="width: 97%; height: 22px; resize: none; boarder:solid 1px gray; font-family:DFKai-sb,標楷體;">
+            <textarea v-bind:class="{ 'bg-dark':isEditable, 'fg-white':isEditable, 'bg-gray':!isEditable }" v-bind:value="inputText" v-on:input="inputText = $event.target.value" :disabled="!isEditable" v-on:click="timerCountdown" @keyup="inputEvents" placeholder='' style="width: 97%; height: 30px; resize: none; boarder:solid 1px gray;">
             </textarea>
             <br/>
             <br/>
-            <div v-if="focusLineCollect[currentLine+1]">
-                <span v-html="focusLineCollect[currentLine+1].str" style="font-size: 1em; font-family:DFKai-sb,標楷體; border-color: gray; border-bottom-style:dashed; ">
-                   </span>
+            <div v-if="focusArticle[currentLine+1]">
+                <span v-html="focusArticle[currentLine+1]" style="border-color: gray; border-bottom-style:dashed; ">
+                </span>
             </div>
+        <!--     
+            <div v-if="theArticleCollect[currentLine+1]">
+                <span v-html="theArticleCollect[currentLine+1].articleText" style="font-size: 1em; font-family:DFKai-sb,標楷體; border-color: gray; border-bottom-style:dashed; ">
+               </span>
+            </div> -->
         </div>
     </div>
     </div>
@@ -83,9 +88,9 @@
             el: "#app",
             data: {
                 inputText: '請注意,滑鼠在此區點擊後,時間開始計算',
-                article: null,
-                focusArticle: null,
-                focusLineCollect: [],
+                article: '',
+                focusArticle: [],
+                theArticleCollect: [],
                 inputTextCollect: [],
                 currentLine: 0,
                 lineLength: 35,
@@ -111,61 +116,44 @@
                     if (this.focusArticle) {
                         eof = '<i class="fa fa-hand-o-down" aria-hidden="true"></i>';
                     } else {
-                        eof = "error, the article is null.";
+                        eof = "發生錯誤了,目前抓不到題目";
 
                     }
                     return eof;
                 },
+
                 typingAccuracy: function() {
-                    let totalInputTextLength = this.inputText.length;
-                    if (this.inputTextCollect.length > 0) {
-                        // console.log(this.inputTextCollect.length)
-                        for (let i = 0; i < this.inputTextCollect.length; i++) {
-                            // console.log(i + ':' + this.inputTextCollect[i]);
-                            // console.log(this.inputTextCollect[i] + ':' + this.inputTextCollect[i].length);
-                            let lineLength = this.inputTextCollect[i].length - 1; //最後一個長度為enter
-                            totalInputTextLength = totalInputTextLength + lineLength;
+                    if (this.hasBegun) {
+                        let totalInputTextLength = this.totalInputTextLength();
+                        this.accuracy = (this.totalScores / totalInputTextLength) * 100;
+                        if (totalInputTextLength === 0 || this.duration === 0 || this.totalScores === 0) {
+                            this.accuracy = 0;
                         }
-                        // console.log(totalInputTextLength);
-
+                        return this.accuracy.toFixed(2);
+                    } else {
+                        return 0;
                     }
-                    this.accuracy = (this.totalScores / totalInputTextLength) * 100;
-
-                    if (totalInputTextLength === 0 || this.duration === 0 || this.totalScores === 0) {
-                        this.accuracy = 0;
-                    }
-
-                    return this.accuracy.toFixed(0);
-                    // return totalInputTextLength;
 
                 },
                 //計算打字速度
-                typingRate: function() { //每五秒為單位
-                    // console.log(this.inputText.length);
-                    let totalInputTextLength = this.inputText.length;
-                    if (this.inputTextCollect.length > 0) {
-                        // console.log(this.inputTextCollect.length)
-                        for (let i = 0; i < this.inputTextCollect.length; i++) {
-                            // console.log(i + ':' + this.inputTextCollect[i]);
-                            // console.log(this.inputTextCollect[i] + ':' + this.inputTextCollect[i].length);
-                            let lineLength = this.inputTextCollect[i].length; 
-                            totalInputTextLength = totalInputTextLength + lineLength;
+                typingRate: function() {
+                    if (this.hasBegun) {
+                        let totalInputTextLength = this.totalInputTextLength();
+                        this.wordsPerMinutes = (totalInputTextLength / this.duration) * 60;
+                        if (totalInputTextLength === 0 || this.duration === 0) {
+                            this.wordsPerMinutes = 0;
                         }
-
+                        return this.wordsPerMinutes.toFixed(0);
+                    } else {
+                        return 0;
                     }
-                        console.log(totalInputTextLength);
-                    // console.log(totalInputTextLength);
-                    this.wordsPerMinutes = (totalInputTextLength / this.duration) * 60;
-                    if (totalInputTextLength === 0 || this.duration === 0) {
-                        this.wordsPerMinutes = 0;
-                    }
-                    return this.wordsPerMinutes.toFixed(0);
 
                 },
                 totalScores: function() {
+                    // console.log(this.currentLine);
                     let sum = 0;
-                    for (var i = 0; i < this.focusLineCollect.length; i++) {
-                        sum = sum + this.focusLineCollect[i].scores;
+                    for (let i = 0; i < this.theArticleCollect.length; i++) {
+                        sum = sum + this.theArticleCollect[i].scores;
                     }
                     return sum;
 
@@ -181,26 +169,38 @@
                     if (this.article.length > 0) {
                         for (let i = 0; i < Math.ceil(this.article.length / this.lineLength); i++) {
                             let obj = {
-                                str: String,
+                                articleText: new String(''),
+                                inputText: new String(''),
                                 scores: 0
                             }
 
-                            obj.str = this.article.slice(i * this.lineLength, (i * this.lineLength) + this.lineLength);
-                            obj.scores = 0;
+                            obj.articleText = this.article.slice(i * this.lineLength, (i * this.lineLength) + this.lineLength);
+                            // obj.scores = 0;
+                            // console.log(obj.inputText.length);
 
-                            this.focusLineCollect.push(obj);
+                            this.theArticleCollect.push(obj);
 
                         }
-                        this.focusArticle = this.focusLineCollect[0].str;
+                        this.focusArticle[this.currentLine] = this.theArticleCollect[0].articleText;
+                        this.focusArticle[this.currentLine+1] = this.theArticleCollect[1].articleText;
 
                     }
                 },
 
             },
             methods: {
-                greet: function(event) {
-                    event.preventDefault();
-                    event.stopPropagation();
+                totalInputTextLength: function() {
+                    // console.log(this.currentLine);
+                    let totalInputTextLength = this.inputText.length;
+
+                    for (let i = 0; i < this.theArticleCollect.length; i++) {
+                        if (i != this.currentLine) {
+                            let lineLength = this.theArticleCollect[i].inputText.length;
+                            totalInputTextLength = totalInputTextLength + lineLength;
+                        }
+                    }
+
+                    return totalInputTextLength;
 
                 },
                 timerCountdown: function() {
@@ -238,87 +238,139 @@
                     });
 
                 },
+                previousLine: function() {
+                    if (this.currentLine > 0) {
+                        this.currentLine--;
+                    }
+                    console.log(this.currentLine);
+                    this.inputText = this.theArticleCollect[this.currentLine].inputText;
+
+                },
                 nextLine: function() {
                     //輸入行資料存入array
-                    this.inputTextCollect[this.currentLine] = this.inputText;
-                    this.focusLineCollect[this.currentLine].str = this.focusArticle;
+                    this.theArticleCollect[this.currentLine].inputText = this.inputText;
+                    // this.theArticleCollect[this.currentLine].articleText = this.focusArticle;
                     // console.log(this.inputTextCollect[this.currentLine]);
 
                     this.currentLine++;
-                    if (this.currentLine < this.focusLineCollect.length) {
-                        //更新焦點行內容 
-                        this.focusArticle = this.focusLineCollect[this.currentLine].str;
-                        this.inputText = '';
+                    if (this.currentLine < this.theArticleCollect.length) {
+                        //更新中央行內容 
+                        this.focusArticle[this.currentLine] = this.theArticleCollect[this.currentLine].articleText;
+
+                        this.inputText = this.theArticleCollect[this.currentLine].inputText.length > 0 ? this.theArticleCollect[this.currentLine].inputText : '';
+
+                        // if (this.theArticleCollect[this.currentLine].inputText != null) {
+                        //     this.inputText = this.theArticleCollect[this.currentLine].inputText;
+
+                        // } else {
+                        //     this.inputText = '';
+
+                        // }
+
                     } else {
                         this.isEditable = false;
                     }
 
                 },
 
-                refreshPage: function(event) {
+                inputEvents: function(event) {
                     // console.log(event.keyCode);
                     if (event.keyCode === 38) {
-                        console.log('previous line');
+                        this.previousLine();
                     }
                     if (event.keyCode === 40) {
                         this.nextLine();
+                        this.repaintFocusArticle();
                     }
                     if (event.keyCode === 13) {
                         // console.log(this.inputText.length);
-                        this.inputText = this.inputText.slice(0,this.inputText.length-1); //last char is enter
+                        this.inputText = this.inputText.slice(0, this.inputText.length - 1); //last char is enter
                         this.nextLine();
+                        this.repaintFocusArticle();
                     }
 
-                    //任何鍵盤事件都會引發refreshPage, 所以必須確保非null
+                    //任何鍵盤事件都會引發inputEvents, 所以必須確保非null
                     if (this.inputText != null) {
-                        if (this.inputText.length <= this.focusLineCollect[this.currentLine].str.length) {
-                            this.focusArticle = '';
-                            this.replacePunctuation();
 
-                            //輸入字串長度與取出該行題目字串長度一字一字比對,計算得分與標顏色
-                            let recallInputChars = this.inputText.slice(0, this.inputText.length);
-                            let recallArticleChars = this.focusLineCollect[this.currentLine].str.slice(0, this.inputText.length);
+                        this.replacePunctuation();
+                        let currentLine = this.currentLine;
+                        let displayChar;
+                        this.focusArticle[currentLine] = '';
 
-                            //每一次輸入事件都是重頭計算, 分數永遠由０開始
-                            this.focusLineCollect[this.currentLine].scores = 0;
-                            // console.log(recallArticleChars.length);
-                            for (let i = 0; i < recallInputChars.length; i++) {
-                                let obj = this.isMatch(recallArticleChars[i], recallInputChars[i]);
-                                // console.log(obj)
-                                if (obj.expression) {
-                                    // console.log(recallInputChars[i]);
-                                    this.focusLineCollect[this.currentLine].scores++;
-                                }
-                                let displayChar = obj.char;
-                                this.focusArticle = this.focusArticle + displayChar;
 
+                        //每一次輸入事件都是重頭計算, 分數永遠由０開始
+                        this.theArticleCollect[currentLine].scores = 0;
+                        for (let i = 0; i < this.inputText.length; i++) {
+                            let inputChar = this.inputText[i];
+                            let articleChar = this.theArticleCollect[currentLine].articleText[i];
+                            //計算得分
+                            if (this.isScored(inputChar, articleChar)) {
+                                this.theArticleCollect[currentLine].scores++;
                             }
-                            this.focusArticle = this.focusArticle + this.focusLineCollect[this.currentLine].str.slice(this.inputText.length);
-                            // console.log(this.focusLineCollect[this.currentLine].scores);
+
+                            // console.log(this.isMatch(articleChar,inputChar));
+                            //輸入字串長度與取出該行題目字串長度一字一字比對,
+                            //輸入行區為立即事件,不應使用repaint 三行都重繪
+                            displayChar = this.isMatch(articleChar, inputChar);
+
+                            this.focusArticle[currentLine] = this.focusArticle[currentLine] + displayChar;
 
                         }
+                        // console.log(this.theArticleCollect[currentLine].scores);
+                        this.focusArticle[currentLine] = this.focusArticle[currentLine] + this.theArticleCollect[currentLine].articleText.slice(this.inputText.length);
 
                     } //if (this.inputText != null)
 
                 },
-                isMatch: function(articleChar, inputChar) {
-                    let obj = {
-                        char: new String(),
-                        expression: new Boolean()
+                repaintFocusArticle: function() {
+
+                    for (let lineNumber = this.currentLine - 1; lineNumber <= this.currentLine + 1; lineNumber++) {
+
+                        //輸入行不比對
+                        if (lineNumber != this.currentLine) {
+
+                            let displayChar;
+                            let theArticleCollect = this.theArticleCollect;
+                            this.focusArticle[lineNumber] = '';
+
+                            for (let i = 0; i < theArticleCollect[lineNumber].inputText.length; i++) {
+
+                                let inputChar = theArticleCollect[lineNumber].inputText[i];
+                                let articleChar = theArticleCollect[lineNumber].articleText[i];
+
+                                let displayChar = this.isMatch(articleChar, inputChar);
+                                this.focusArticle[lineNumber] = this.focusArticle[lineNumber] + displayChar;
+
+                            }
+                            this.focusArticle[lineNumber] = this.focusArticle[lineNumber] + theArticleCollect[lineNumber].articleText.slice(theArticleCollect[lineNumber].inputText.length);
+
+                            console.log(this.focusArticle[lineNumber]);
+
+                        }
+
                     }
 
+                },
+                isMatch: function(articleChar, inputChar) {
                     if (articleChar === inputChar) {
                         articleChar = '<span class="fg-blue">' + articleChar + '</span>';
-                        obj.expression = true;
                     } else {
                         articleChar = '<span style="color:red">' + articleChar + '</span>';
-                        obj.expression = false;
 
                     }
-                    obj.char = articleChar;
 
-                    return obj;
+                    return articleChar;
 
+                },
+                isScored: function(articleChar, inputChar) {
+                    let expression = new Boolean();
+                    if (articleChar === inputChar) {
+                        expression = true;
+                    } else {
+                        expression = false;
+
+                    }
+                    return expression;
 
                 },
                 replacePunctuation: function(str) { //置換符號
