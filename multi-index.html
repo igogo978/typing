@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link href="css/font-awesome.css" rel="stylesheet">
+    <link href="css/metro.css" rel="stylesheet">
+    <link href="css/metro-icons.css" rel="stylesheet">
+    <link href="css/metro-responsive.css" rel="stylesheet">
+    <script src="js/vue.js"></script>
+    <script src="js/vue-resource.min.js"></script>
+    <link rel="import" href="typing.html">
+</head>
+
+<body class="bg-grayLighter" oncontextmenu="return false" ; onkeydown="if(((event.shiftKey) && (event.keyCode==121)) || event.altKey || (event.altKey && event.keyCode==115) || (event.keyCode==78 && event.ctrlKey) || ((event.ctrlKey) && (event.keyCode==86))) return false;" ondrag="return false;" onpaste="return false;" onselectstart="return false;" onselect="document.selection.empty();" oncopy="document.selection.empty();" onbeforecopy="return false;">
+    <div class="container fg-black" id='app'>
+        {{msg}}
+        <component v-bind:is="currentView">
+            <!-- component changes when vm.currentView changes! -->
+        </component>
+    </div>
+   
+    <!-- end of #app -->
+    <footer>
+    <script src="Home.js"></script>
+    <script src="TypingEn.js"></script>
+    <script src="TypingZh.js"></script>
+        <script>
+        "use strict";
+
+        Vue.http.options.emulateJSON = true;
+
+        Vue.component('Home', {
+            template: Home
+        });
+
+        Vue.component('TypingEn', {
+            template: TypingEn
+        });
+
+        Vue.component('TypingZh', {
+            template: TypingZh
+        });
+
+        var vm = new Vue({
+            el: "#app",
+            data: {
+                msg: 'hello vue',
+                currentView: TypingZh
+            }
+        });
+        </script>
+    </footer>
+</body>
+
+</html>
