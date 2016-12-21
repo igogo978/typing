@@ -1,11 +1,13 @@
 <?php
 header('Content-Type: application/json; charset=utf-8');
 $request = $_POST['foo'];
+// $request = 'bar';
+$fileArticle = "./articles/zh/朱子治家格言.txt";
 if ($request == 'bar') {
 
-	$afile = fopen("article.txt", "r") or die("Unable to open file!");
+	$afile = fopen($fileArticle, "r") or die( $content = "Unable to open file!");
 
-	$content = fread($afile,filesize("article.txt"));
+	$content = fread($afile,filesize($fileArticle));
 	$content = urlencode($content);
 	fclose($afile);
 
