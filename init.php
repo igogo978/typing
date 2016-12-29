@@ -57,7 +57,7 @@
     </template>
 
     <template id="typingArticle">
-        <div class="container">
+        <div class="container fg-white">
             <div class="row">
                 <div class="col-xs-1 col-md-1">
                 </div>
@@ -65,18 +65,18 @@
                     <h3>
                         <div>
                             <label class="tag tag-pill tag-info bg-darkCobalt fg-white">
-                                計時:  <!-- {{contestTime}} -->
+                                計時:  {{contestTime}}
                             </label>
 
                             <div class="pull-right">
                                 <label class="tag tag-pill tag-info bg-darkCobalt fg-white">
-                                    得分:  <!-- {{totalScores}} --> 
+                                    得分:  {{totalScores}} 
                                 </label>
                                 <label class="tag tag-pill tag-info bg-darkCobalt fg-white">
-                                    正確率:  <!-- {{typingAccuracy}} --> 
+                                    正確率:  {{typingAccuracy}} 
                                 </label>
                                 <label class="tag tag-pill tag-info bg-darkCobalt fg-white">
-                                    <!-- {{typingRate}} --> 字/分
+                                    {{typingRate}} 字/分
                                 </label>
                             </div>
 
@@ -93,6 +93,32 @@
                             中文打字練習
                         </div>
                     </div>
+
+                    <div v-if="focusArticle[currentLine-1]">
+                        <span v-html="focusArticle[currentLine-1]" style="border-color: gray; border-bottom-style:dashed; ">
+                        </span>
+                    </div>
+                    <br/>
+
+                      <!-- 中心行 即目前打字區域 -->
+                    <span v-html="focusArticle[currentLine]" class="text-light">
+                    </span>
+                    <span v-html="endOfLine"> end of the line (enter key icon) </span>
+                    </span>
+                    <br/>
+                    <textarea v-bind:class="{ 'bg-dark':isEditable, 'fg-white':isEditable, 'bg-gray':!isEditable }" v-bind:value="inputText" v-on:input="inputText = $event.target.value" :disabled="!isEditable" @keyup="inputEvents" placeholder='' style="width: 97%; height: 30px; resize: none; boarder:solid 1px gray;">
+                    </textarea>
+                    <br/>
+                    <br/>
+
+                    <div v-if="focusArticle[currentLine+1]">
+                        <span v-html="focusArticle[currentLine+1]" style="border-color: gray; border-bottom-style:dashed; ">
+                        </span>
+                    </div>
+
+
+
+
                 </div>
             </div>
 
