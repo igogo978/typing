@@ -56,24 +56,24 @@
                     <span v-html="focusArticle[currentLine-1]" style="border-color: gray; border-bottom-style:dashed; ">
                     </span>
                 </div>
-            <br/>
-            <!-- 中心行 即目前打字區域 -->
-            <span v-html="focusArticle[currentLine]" class="text-light">
-            </span>
-            <span v-html="endOfLine"> end of the line (enter key icon) </span>
-            </span>
-            <br/>
-            <textarea v-bind:class="{ 'bg-dark':isEditable, 'fg-white':isEditable, 'bg-gray':!isEditable }" v-bind:value="inputText" v-on:input="inputText = $event.target.value" :disabled="!isEditable" @keyup="inputEvents" placeholder='' style="width: 97%; height: 30px; resize: none; boarder:solid 1px gray;">
-            </textarea>
-            <br/>
-            <br/>
-            <div v-if="focusArticle[currentLine+1]">
-                <span v-html="focusArticle[currentLine+1]" style="border-color: gray; border-bottom-style:dashed; ">
+                <br/>
+                <!-- 中心行 即目前打字區域 -->
+                <span v-html="focusArticle[currentLine]" class="text-light">
                 </span>
+                <span v-html="endOfLine"> end of the line (enter key icon) </span>
+                </span>
+                <br/>
+                <textarea v-bind:class="{ 'bg-dark':isEditable, 'fg-white':isEditable, 'bg-gray':!isEditable }" v-bind:value="inputText" v-on:input="inputText = $event.target.value" :disabled="!isEditable" @keyup="inputEvents" placeholder='' style="width: 97%; height: 30px; resize: none; boarder:solid 1px gray;">
+                </textarea>
+                <br/>
+                <br/>
+                <div v-if="focusArticle[currentLine+1]">
+                    <span v-html="focusArticle[currentLine+1]" style="border-color: gray; border-bottom-style:dashed; ">
+                    </span>
+                </div>
+        
             </div>
-    
         </div>
-    </div>
     </div>
     <!-- end of #app -->
     <footer>
