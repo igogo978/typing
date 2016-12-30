@@ -22,7 +22,7 @@
        <!-- component changes when vm.currentView changes! -->
     </component>
 
-    <button v-if="currentView==='initPage'" type="button" class="btn btn-success pull-right"@click="currentView='typingArticle'">開始練習</button>
+    <!-- <button v-if="currentView==='initPage'" type="button" class="btn btn-success pull-right"@click="currentView='typingArticle'">開始練習</button> -->
 
         <!-- {{selectedArticleId}} -->
         <!-- {{selectedDuration}} -->
@@ -56,7 +56,7 @@
                                             {{ (duration) }}
                                         </option>
                                     </select>
-                                    <!-- <button v-on:click="say" class="btn-success pull-right"> 開始 </button>  -->
+                                    <button v-on:click="updateView" class="btn-success pull-right"> 開始 </button> 
 
                                 </div>
                     <!-- {{selectedOption}} -->
@@ -193,6 +193,7 @@
                 },
                 updateView: function(value) {
                     console.log(value);
+                    this.currentView = value;
                 }
 
             }

@@ -35,8 +35,7 @@ Vue.component('initPage', {
 
         },
         updateView: function () {
-            console.log('hello')
-            // this.$emit('update-view', 'typingArticle');
+            this.$emit('update-view', 'typingArticle');
 
         },
         say: function () {
