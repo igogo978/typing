@@ -56,7 +56,7 @@
                                             {{ (duration) }}
                                         </option>
                                     </select>
-                                    <button v-on:click="say" class="btn-success pull-right"> 開始 </button> 
+                                    <!-- <button v-on:click="say" class="btn-success pull-right"> 開始 </button>  -->
 
                                 </div>
                     <!-- {{selectedOption}} -->
