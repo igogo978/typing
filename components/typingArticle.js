@@ -19,7 +19,7 @@ Vue.component('typingArticle', {
         }
     },
     created: function() {
-
+        this.contestTime = this.selectedDuration;
         // console.log('created');
         let url = 'getArticle.php';
         this.$http.post(url, {
@@ -125,23 +125,26 @@ Vue.component('typingArticle', {
 
         },
         timerCountdown: function() {
+            var self = this;
             // console.log(this.hasBegun);
             // if (this.hasBegun == false) { //hasBeun: false  還沒開始
             //     this.hasBegun = true;
             //     this.inputText = '';
             //時間計算
-            let i = this.contestTime - 1;
-            let j = this.duration + 1;
+            // let i = this.contestTime - 1;
+            // let j = this.duration + 1;
             let isEditable = this.isEditable;
             const intervalId = setInterval(function() {
                 // console.log("duration: " + j);
-                Vue.set(vm, 'contestTime', i);
-                Vue.set(vm, 'duration', j);
-                i--;
-                j++;
-                if (i < 0) {
+                // Vue.set(vm, 'contestTime', i);
+                // Vue.set(vm, 'duration', j);
+                // console.log(self.duration++);
+                self.duration++;
+                self.contestTime--;
+                if (self.contestTime < 0) {
 
-                    Vue.set(vm, 'isEditable', false);
+                    self.isEditable = false ;
+                    // Vue.set(vm, 'isEditable', false);
                     clearInterval(intervalId);
 
                 }

@@ -9,6 +9,7 @@ Vue.component('initPage', {
         }
     },
     created: function() {
+        this.say();
         this.selectedOption = this.selected;
     },
     computed: {
@@ -25,12 +26,21 @@ Vue.component('initPage', {
         }
     },
     methods: {
-        updateSelectedArticle: function() {
+        updateSelectedArticle: function () {
             // console.log(this.selectedOption)
             this.$emit('update-selected-article', this.selectedOption);
         },
-        updateselectedDuration: function() {
+        updateselectedDuration: function () {
             this.$emit('update-selected-duration', this.preSelectedDuration);
+
+        },
+        updateView: function () {
+            console.log('hello')
+            // this.$emit('update-view', 'typingArticle');
+
+        },
+        say: function () {
+            console.log('hello');
 
         }
 

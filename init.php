@@ -18,11 +18,11 @@
     <div class="container" id='app'>
 
        
-<component v-bind:is="currentView" :articles="articles" v-on:update-selected-article="updateArticle" v-on:update-selected-duration="updateDuration" :selected-article-id="selectedArticleId" :selected-duration="selectedDuration">
-   <!-- component changes when vm.currentView changes! -->
-</component>
+    <component v-bind:is="currentView" :articles="articles" v-on:update-selected-article="updateArticle" v-on:update-selected-duration="updateDuration" :selected-article-id="selectedArticleId" :selected-duration="selectedDuration" v-on:update-view="updateView">
+       <!-- component changes when vm.currentView changes! -->
+    </component>
 
-            <button type="button" class="btn btn-success" @click="currentView='typingArticle'">開始練習</button>
+    <button v-if="currentView==='initPage'" type="button" class="btn btn-success pull-right"@click="currentView='typingArticle'">開始練習</button>
 
         <!-- {{selectedArticleId}} -->
         <!-- {{selectedDuration}} -->
@@ -30,28 +30,41 @@
 
 
     <template id="initPage">
-        <div class="container">
-            <div class="col-md-1">
-            選擇文章
-                <select v-model="selectedOption" v-on:change="updateSelectedArticle(selectedOption)">
-                    <option v-for="article in menu" v-bind:value="article.id">
-                        {{ decodeURIComponent(article.fileName) }}
-                    </option>
-                </select>
-                <!-- {{selectedOption}} -->
-            </div>
-            <div class="col-md-1">
-            計時
+        <div class="container fg-white">
 
-            
-                <select v-model="preSelectedDuration" v-on:change="updateselectedDuration(preSelectedDuration)">
-                    <option v-for="duration in durationOptions" v-bind:value="duration">
-                        {{ (duration) }}
-                    </option>
-                </select>
-                {{preSelectedDuration}}
+            <div class="row">
+                    <div class="col-xs-1 col-md-1">
+                    </div>
+                    <div class="col-xs-10 col-md-10 bg-black padding10 block-shadow" style="border:solid 2px gray; border-radius: 5px;">
+                        <div class="panel">
+                            <div class="heading bg-darkBlue fg-grayLighter">
+                                中文打字練習
+                            </div>
+                        </div>
 
+                            <span style="border-color: gray; border-bottom-style:dashed; ">
+                                <div class="col-md-10">
+                                    選擇文章：
+                                    <select v-model="selectedOption" v-on:change="updateSelectedArticle(selectedOption)" class="fg-black">
+                                        <option v-for="article in menu" v-bind:value="article.id">
+                                            {{ decodeURIComponent(article.fileName) }}
+                                        </option>
+                                    </select>
+                                    選擇時間：
+                                    <select v-model="preSelectedDuration" v-on:change="updateselectedDuration(preSelectedDuration)" class="fg-black">
+                                        <option v-for="duration in durationOptions" v-bind:value="duration">
+                                            {{ (duration) }}
+                                        </option>
+                                    </select>
+                                    <button v-on:click="say" class="btn-success pull-right"> 開始 </button> 
+
+                                </div>
+                    <!-- {{selectedOption}} -->
+                            </span>
+                    </div>
             </div>
+        </div>    
+           
 
         </div>
     </template>
@@ -177,6 +190,9 @@
                     // this.duration = value;
                     console.log(value);
                     this.selectedDuration = value;
+                },
+                updateView: function(value) {
+                    console.log(value);
                 }
 
             }
