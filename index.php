@@ -14,7 +14,7 @@
     <script src="js/vue-resource.min.js"></script>
 </head>
 
-<body class="bg-grayLighter fg-black">
+<body class="bg-grayLighter fg-grayLighter" oncontextmenu="return false" ; onkeydown="if(((event.shiftKey) && (event.keyCode==121)) || event.altKey || event.keyCode==116 || (event.altKey && event.keyCode==115) || (event.keyCode==78 && event.ctrlKey) || ((event.ctrlKey) && (event.keyCode==86))) return false;" ondrag="return false;" onpaste="return false;" onselectstart="return false;" onselect="document.selection.empty();" oncopy="document.selection.empty();" onbeforecopy="return false;">
     <div class="container" id='app'>
 
        
