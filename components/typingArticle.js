@@ -22,12 +22,14 @@ Vue.component('typingArticle', {
         this.contestTime = this.selectedDuration;
         // console.log('created');
         let url = 'getArticle.php';
+        var self=this;
         this.$http.post(url, {
             articleId: this.selectedArticleId
         }).then(response => {
             // console.log(response.data.article);
-            this.article = decodeURIComponent(response.data.article);
-            // console.log(this.articles)
+            self.article = decodeURIComponent(response.data.article);
+            // console.log(typeof self.article);
+            console.log(self.article.substr(0,2));
         });
     },
     computed: {

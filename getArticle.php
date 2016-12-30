@@ -9,7 +9,7 @@ $requestArticle = $articles[$requestArticleID];
 
 $afile = fopen($requestArticle, "r") or die( $content = "Unable to open file!");
 
-$content = fread($afile,filesize($requestArticle));
+$content = trim(fread($afile,filesize($requestArticle)));
 fclose($afile);
 
 $response = ['article' => rawurlencode($content) ];
